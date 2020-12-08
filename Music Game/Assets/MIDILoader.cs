@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
+using System;
+
 
 public class MIDILoader : MonoBehaviour
 {
@@ -56,7 +59,6 @@ public class MIDILoader : MonoBehaviour
         // リスト初期化
         noteList.Clear();
         tempoList.Clear();
-
         using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
         using (var reader = new BinaryReader(stream))
         {
@@ -99,7 +101,7 @@ public class MIDILoader : MonoBehaviour
             }
 
             /* トラックチャンク侵入 */
-            trackChunks = new TrackChunkData[headerChunk.tracks];
+            var trackChunks = new TrackChunkData[headerChunk.tracks];
 
             // トラック数ぶん
             for (int i = 0; i < headerChunk.tracks; i++)
@@ -132,10 +134,10 @@ public class MIDILoader : MonoBehaviour
     /// <summary>
     /// トラックデータ解析
     /// </summary>
-    public void TrackDataAnalysis(byte[] data, HeaderChuckData headerChunk)
+    public void TrackDataAnalysis(byte[] data, HeaderChunkData headerChunk)
     {
-        uint currentTime;                    // デルタタイムを足していく、つまり現在の時間(ms)（ノーツやソフランのイベントタイムはこれを使う）
-        byte statusByte;                     // ステータスバイト
+        uint currentTime = 0;                    // デルタタイムを足していく、つまり現在の時間(ms)（ノーツやソフランのイベントタイムはこれを使う）
+        byte statusByte = 0;                     // ステータスバイト
         bool[] longFlags = new bool[128];    // ロングノーツ用フラグ
 
         // データ分
